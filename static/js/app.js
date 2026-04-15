@@ -11,9 +11,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const scholarCode = document.getElementById('scholar-bibtex');
     const arxivCard = document.querySelector('.arxiv-card');
     const scholarCard = document.querySelector('.scholar-card');
+    const arxivMatchInfo = document.getElementById('arxiv-match-info');
+    const scholarMatchInfo = document.getElementById('scholar-match-info');
 
     // Copy buttons
     const copyBtns = document.querySelectorAll('.copy-btn');
+
+    function formatMatchInfo(meta, fallbackLabel) {
+        if (!meta) return '';
+
+        if (meta.matched_title) {
+            const parts = [`Matched: ${meta.matched_title}`];
+            if (meta.query_used && meta.query_used !== meta.matched_title) {
+                parts.push(`Query used: ${meta.query_used}`);
+            }
+            if (typeof meta.score === 'number') {
+                parts.push(`Score: ${meta.score.toFixed(3)}`);
+            }
+            return parts.join(' | ');
+        }
+
+        if (meta.error) {
+            return `${fallbackLabel}: ${meta.error}`;
+        }
+
+        return '';
+    }
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -29,6 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         arxivCode.textContent = '';
         scholarCode.textContent = '';
+        arxivMatchInfo.textContent = '';
+        scholarMatchInfo.textContent = '';
         arxivCard.classList.remove('not-found');
         scholarCard.classList.remove('not-found');
 
@@ -53,15 +78,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.arxiv && data.arxiv !== "Not found") {
                 arxivCode.textContent = data.arxiv;
+                arxivMatchInfo.textContent = formatMatchInfo(data.arxiv_meta, 'arXiv');
             } else {
                 arxivCode.textContent = "Citation not found on arXiv.";
+                arxivMatchInfo.textContent = formatMatchInfo(data.arxiv_meta, 'arXiv');
                 arxivCard.classList.add('not-found');
             }
 
             if (data.scholar && data.scholar !== "Not found") {
                 scholarCode.textContent = data.scholar;
+                scholarMatchInfo.textContent = formatMatchInfo(data.scholar_meta, 'Google Scholar');
             } else {
                 scholarCode.textContent = "Citation not found on Google Scholar.\n(Note: May be rate-limited limit)";
+                scholarMatchInfo.textContent = formatMatchInfo(data.scholar_meta, 'Google Scholar');
                 scholarCard.classList.add('not-found');
             }
 
@@ -81,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetEl = document.getElementById(targetId);
             const textToCopy = targetEl.textContent;
 
-            if (!textToCopy || targetEl.parentElement.classList.contains('not-found')) return;
+            if (!textToCopy || targetEl.closest('.result-card').classList.contains('not-found')) return;
 
             try {
                 await navigator.clipboard.writeText(textToCopy);

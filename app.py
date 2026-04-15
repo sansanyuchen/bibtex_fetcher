@@ -1,5 +1,6 @@
-from flask import Flask, request, jsonify, render_template
-from fetcher import fetch_from_arxiv, fetch_from_scholar
+from flask import Flask, jsonify, render_template, request
+
+from fetcher import search_bibtex as run_search
 
 app = Flask(__name__)
 
@@ -8,7 +9,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/api/search', methods=['POST'])
-def search_bibtex():
+def search_bibtex_api():
     data = request.json
     title = data.get('title')
     source = data.get('source', 'both') # 'arxiv', 'scholar', or 'both'
@@ -16,15 +17,28 @@ def search_bibtex():
     if not title:
         return jsonify({"error": "Title is required"}), 400
 
+    search_results = run_search(title, source=source)
     results = {}
 
-    if source in ['both', 'arxiv']:
-        arxiv_bibtex = fetch_from_arxiv(title)
-        results['arxiv'] = arxiv_bibtex if arxiv_bibtex else "Not found"
+    if 'arxiv' in search_results:
+        arxiv = search_results['arxiv']
+        results['arxiv'] = arxiv['bibtex'] if arxiv['bibtex'] else "Not found"
+        results['arxiv_meta'] = {
+            "matched_title": arxiv.get("matched_title"),
+            "query_used": arxiv.get("query_used"),
+            "score": arxiv.get("score"),
+            "error": arxiv.get("error"),
+        }
 
-    if source in ['both', 'scholar']:
-        scholar_bibtex = fetch_from_scholar(title)
-        results['scholar'] = scholar_bibtex if scholar_bibtex else "Not found"
+    if 'scholar' in search_results:
+        scholar = search_results['scholar']
+        results['scholar'] = scholar['bibtex'] if scholar['bibtex'] else "Not found"
+        results['scholar_meta'] = {
+            "matched_title": scholar.get("matched_title"),
+            "query_used": scholar.get("query_used"),
+            "score": scholar.get("score"),
+            "error": scholar.get("error"),
+        }
 
     return jsonify(results)
 

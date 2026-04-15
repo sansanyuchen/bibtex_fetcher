@@ -23,6 +23,7 @@
                         <button type="submit" id="search-btn">Fetch BibTeX</button>
                     </div>
                 </form>
+                <p class="search-hint">Fuzzy title matching is enabled by default, so partial titles and small typos can still work.</p>
             </div>
 
             <div id="loading" class="hidden">
@@ -36,6 +37,7 @@
                         <div class="badge arxiv-badge">arXiv</div>
                         <button class="copy-btn" data-target="arxiv-bibtex">Copy</button>
                     </div>
+                    <div class="match-info" id="arxiv-match-info"></div>
                     <pre><code id="arxiv-bibtex"></code></pre>
                 </div>
                 
@@ -44,6 +46,7 @@
                         <div class="badge scholar-badge">Google Scholar</div>
                         <button class="copy-btn" data-target="scholar-bibtex">Copy</button>
                     </div>
+                    <div class="match-info" id="scholar-match-info"></div>
                     <pre><code id="scholar-bibtex"></code></pre>
                 </div>
             </div>
