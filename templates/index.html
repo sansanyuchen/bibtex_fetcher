@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BibTeX Citation Fetcher</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>BibTeX Fetcher</h1>
+            <p>Find citations instantly from arXiv and Google Scholar</p>
+        </header>
+
+        <main>
+            <div class="search-container">
+                <form id="search-form">
+                    <div class="input-group">
+                        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="paper-title" placeholder="Enter paper title (e.g., 'Attention Is All You Need')" required autocomplete="off">
+                        <button type="submit" id="search-btn">Fetch BibTeX</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="loading" class="hidden">
+                <div class="spinner"></div>
+                <p>Searching databases...</p>
+            </div>
+
+            <div id="results" class="results-container hidden">
+                <div class="result-card arxiv-card">
+                    <div class="card-header">
+                        <div class="badge arxiv-badge">arXiv</div>
+                        <button class="copy-btn" data-target="arxiv-bibtex">Copy</button>
+                    </div>
+                    <pre><code id="arxiv-bibtex"></code></pre>
+                </div>
+                
+                <div class="result-card scholar-card">
+                    <div class="card-header">
+                        <div class="badge scholar-badge">Google Scholar</div>
+                        <button class="copy-btn" data-target="scholar-bibtex">Copy</button>
+                    </div>
+                    <pre><code id="scholar-bibtex"></code></pre>
+                </div>
+            </div>
+            
+            <div id="error-message" class="error-container hidden">
+                <p></p>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
